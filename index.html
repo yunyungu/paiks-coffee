@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="shortcut icon" href="./favicon.png" type="image/x-icon">
+    <link rel="stylesheet" href="./css/reset.css">
+    <link rel="stylesheet" href="./css/bxslider.css">
+
+    <script src="./js/jquery.js"></script>
+    <script src="./js/bxslider.js"></script>
+    <title>빽다방</title>
+    <style>
+        .container{
+            max-width:1200px;
+            margin:0 auto;
+            padding:0 16px;
+        }
+        .wrap{
+            overflow:hidden;
+            display:grid;
+            grid-template-columns:repeat(12,1fr);           
+        }
+        .sec,.footer{
+            grid-column:1/-1;
+        }
+        .header,.aside{
+            position:fixed;
+            left:0;
+            right:0;
+            top:0;
+            z-index:1000;
+        }
+        .sec-com{
+           height:240px;
+           padding:40px 0 20px; 
+           background-repeat:no-repeat;
+           background-position:60%;
+           background-size:cover;
+        }
+        .sec-com .container{
+            position:relative;
+            height:100%;
+        }
+        .sec-com h2{
+            padding-bottom:30px;
+            font-weight:900;
+            font-size:3em;
+            line-height:1;
+        }
+        .sec-com p{
+            display:none;
+            font-weight:700;
+            font-size:1.1em;
+        }
+        .sec-com .btn-view{
+            position:absolute;
+            right:24px;
+            bottom:0px;
+        }
+        .sec-com .btn-view a{
+            position:relative;
+            display:block;
+            width:50px;
+            height:50px;
+            border-radius:50%;
+            background:#fff;
+            font-size:0;
+        }
+        .sec-com .btn-view a::before,
+        .sec-com .btn-view a::after{
+            content:'';
+            display:block;
+            width:100%;
+            height:100%;
+            background:url(./images/icon-view.png) no-repeat center;
+            background-size:20px;
+            transition:0.5s;
+        }
+        .sec-com .btn-view a:hover::before{
+            transform:rotate(360deg);
+        }
+        .sec-com .btn-view a::after{
+            position:absolute;
+            left:0;
+            top:0;
+            background-image:url(./images/ico-link.png);
+            background-size:cover;
+            transform:rotate(-360deg) scale(0);
+            opacity:0;
+        }
+        .sec-com .btn-view a:hover::after{
+            transform:rotate(0deg) scale(1);
+            opacity:1;
+        }
+        .sec-com01{
+            height:50vw;            
+        }
+        .sec-com01 h2{
+            position:relative;
+            margin-bottom:20px;
+            font-size:1.8em;
+        }
+        .sec-com01 h2::after{
+            position:absolute;
+            left:0;
+            bottom:0;
+            content:'';
+            display:block;
+            width:50px;
+            height:2px;
+            background:#000;
+        }
+
+        
+        .header{
+            padding:20px 0;
+            z-index:1001;
+            background:#fff;
+        }
+        .header::after{
+            content:'';
+            display:block;
+            position:absolute;
+            left:0;
+            right:0;
+            top:100%;
+            z-index:9;
+            height:calc(100vh);
+            background:#000;
+            opacity:0;
+            transform:translateX(100%);
+            transition:opacity 0.3s;
+        }
+        .header.active::after{
+            opacity:0.2;
+            transform:translateX(0);
+        }
+        .header .container{
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+        }
+        .header h1{
+            width:100px;
+        }
+        .header h1 span{
+            display:none;
+        }
+        .header .q-nav{
+            display:none;
+        }
+        .header .q-nav ul{
+            display:flex;
+            align-items:center;
+        }
+        .header .q-nav ul li:first-child{
+            position:relative;
+            margin-right:30px;
+            font-size:0.7em;
+            opacity:0.4;
+        }
+        .header .q-nav ul li:first-child::after{
+            content:'';
+            display:block;
+            width:1px;
+            height:8px;
+            background:#000;
+            opacity:0.4;
+            position:absolute;
+            right:-15px;
+            top:50%;
+            transform:translateY(-50%);
+        }
+        .header .q-nav img{
+            width:22px;
+        }
+        .header .btn-nav{            
+            width:30px;
+            height:24px;
+            cursor:pointer;
+            transition: 1s;
+        }
+        .header .btn-nav.active{
+            transform:rotate(360deg);
+        }
+        .header .btn-nav::before,.header .btn-nav::after{
+            content:'';
+            display:block;
+            width:100%;
+            height:4px;
+            border-radius:1px;            
+            background:#222;
+            transition:0.3s;
+        }
+        .header .btn-nav span{
+            display:block;
+            width:100%;
+            height:4px;
+            margin:6px 0;
+            border-radius:1px;            
+            background:#222;
+            text-indent:-99999px;
+            transition:0.3s;
+        }
+        .header .btn-nav.active span{
+            transform:scaleX(0);
+        }
+        .header .btn-nav.active::before{
+            transform: translateY(10px) rotate(45deg);
+        }
+        .header .btn-nav.active::after{
+            transform:translateY(-10px) rotate(-45deg);
+        }
+        .header nav{           
+            position:absolute;            
+            right:0;
+            top:100%;
+            z-index:10;
+            transform:translateX(100%);
+            width:70%;
+            height:100vh;
+            background:#f9f9f9;
+            transition:0.3s ease-in-out;
+        }
+        .header .btn-nav.active + nav{
+            transform:translateX(0);
+        }
+        .header .main-nav{
+            display:flex;
+            flex-flow:column nowrap;            
+        }
+        .header .main-nav>li{
+            border-bottom:1px solid #eee;
+            padding:0.8em;
+            font-weight:500;
+            font-size:1.2em;
+        } 
+        .header nav a{
+            display:block;
+        }                
+        .header .sub-nav{                        
+            display:none;
+        }        
+        .header .sub-nav>li{
+            border-bottom:1px solid #eee;
+            padding:0.8em;
+            font-weight:400;
+            font-size:0.8em;
+        }
+        .header .sub-nav>li:last-child{
+            border-bottom:none;
+            padding-bottom:0;
+        }
+        .aside{
+            left:auto;
+            right:24px;
+            top:100px;
+            width:100px;
+        }
+        .aside li{
+            margin-bottom:16px;
+        }
+        .aside img{
+            border-radius:50%;
+            box-shadow:4px 4px 4px rgba(0,0,0,0.2);
+        }
+        
+        .sec01 .container{
+            max-width:100%;
+            padding:0;
+        }
+        .bx-wrapper {
+            margin-bottom:0;
+            -moz-box-shadow:none;
+            -webkit-box-shadow:none;
+            box-shadow:none;
+            border:none;
+            background:transparent;
+        }
+        .bx-wrapper .bx-pager, .bx-wrapper .bx-controls-auto{
+            bottom:30px;
+        }
+        .bx-wrapper .bx-pager.bx-default-pager a{
+            width:12px;
+            height:12px;
+            margin:0 12px;
+            border-radius:50%;
+            background:#fff;
+        }
+        .bx-wrapper .bx-pager.bx-default-pager a:hover, .bx-wrapper .bx-pager.bx-default-pager a.active, .bx-wrapper .bx-pager.bx-default-pager a:focus {
+            background: #fe0;
+        }
+
+        .sec02{
+            background-image:url(./images/main-sec02.jpg);            
+            color:#253f85;
+        }
+        .sec03{
+            background-color:#253f85;
+            background-image:url(./images/main-sec03.jpg);            
+            background-position-x:86%;
+            background-position-y:70%;
+            background-size:200px;
+            color:#fff;
+        }
+        
+        .sec04{
+            background-image:url(./images/main-mo-sec04.jpg);
+            color:#6b4d30;
+        }
+        .sec04 h2::after{
+            background:#6b4d30;
+        }
+        .sec05{
+            background-image:url(./images/main-mo-sec05.jpg);
+            color:#253f85;
+        }
+        .sec05 h2::after{
+            background:#253f85;
+        }
+        .sec06{
+            background-image:url(./images/main-mo-sec06.jpg);
+            color:#f1ae1d;
+        }
+        .sec06 h2::after{
+            background:#f1ae1d;
+        }
+        .sec07{
+            background-image:url(./images/main-mo-sec08.jpg);
+            color:#fff;
+        }
+        .sec07 h2::after{
+            background:#fff;
+        }
+        .sec08{
+            padding:16px 0;
+            color:#253f85;
+        }
+        .sec08 .container{
+            display:grid;
+            grid-template-columns:1fr 1fr;
+            gap:10px;
+        }
+        .sec08 h2{
+            display:none;
+        }
+        .sec08 article{
+            border:2px solid #253f85;
+            padding:16px;
+            order:1;
+        }
+        .sec08 article:first-of-type{
+            order:2;
+        }
+        .sec08 h3{
+            margin-bottom:0.5em;
+            font-weight:900;
+            font-size:1.5em;
+        }
+        .sec08 p{
+            display:block;
+            font-weight:500;
+            font-size:1em;
+            color:#222;
+        }
+        .sec08 .btn-view{
+            right:auto;
+            left:16px;
+            bottom:6px;
+        }
+
+        /* 사이드 / 택스트 쿼리 */
+        @media (min-width:760px){          
+            .aside{
+                right:36px;
+                top:120px;
+                width:160px;
+            }
+            .sec-com01 h2{
+                font-size:2.2em;
+            }
+        }
+
+
+        /* 메인쿼리 */
+        @media (min-width:1020px){
+            .aside{
+                right:42px;
+                top:150px;
+                width:180px;
+            }
+            .sec02{
+                grid-column-end:7;
+            }
+            .sec03{
+                grid-column-start:7;
+            }
+            .sec05{
+                grid-column-end:8;
+            }
+            .sec06{
+                grid-column-start:8;
+            }
+            .sec07{
+                grid-column-start:6;
+                grid-row:5/6;
+            }
+            .sec08{
+                grid-column-end:6;
+                grid-row:5/6;
+            }
+            .sec08 article{
+                grid-column:1/-1;
+                order:2;
+            }
+            .sec08 article:first-of-type{
+                order:1;
+            }
+        }
+
+
+        /* 헤더 / 버튼 / 사이드 / 택스트 */
+        @media (min-width:1200px){
+            .sec-com{
+                height:320px;
+            }
+            .sec-com h2{
+                font-size:3em;
+            }            
+            .sec-com p{
+                display:block;
+            }
+            .sec-com .btn-view{
+                right:auto;
+                left:16px;
+            }
+            .sec-com01{
+                height:30vw;
+            }
+            .header::after{
+                display:block;
+                height:0;
+                background:#fe0;
+                transform:none;
+                opacity:1;
+                transition:0.3s;
+            }
+            .header.active::after{                
+                opacity:1;
+                transform:none;
+                height:176px;
+            }
+            .header .container{
+                position:relative;
+                align-items:flex-end;
+            }
+            .header h1{
+                width:200px;
+            }
+            
+            .header .q-nav{
+                display:block;
+                position:absolute;
+                right:16px;
+                top:0;
+            }
+            .header .btn-nav{
+                display:none;
+            }
+            .header nav{                
+                position:static;
+                transform:translateX(0);
+                transition:none;
+                width:auto;
+                height:auto;
+                background:transparent;
+            }
+            .header .main-nav{
+                flex-flow:row nowrap;
+            }
+            .header .main-nav>li{
+                position:relative;
+                margin-left:80px;
+                border-bottom:none;
+                padding:0;
+                font-weight:500;
+                font-size:15px;
+                color:#000;
+            }
+            .header .sub-nav{
+                display:none;
+                position:absolute;
+                left:0;
+                top:55px;
+            }
+            .header .sub-nav li{
+                width:200px;
+                margin-bottom:0.8em;
+                border-bottom:none;
+                padding:0;
+                font-size:15px;
+            }
+            .header .sub-nav li:hover{
+                font-weight:700;
+            }
+            .sec02 .container{
+                width:600px;
+                margin-left:auto;
+                margin-right:0;
+            }
+            .sec03{
+                background-position-x:50px;
+            }
+            .sec03 .container{
+                width:600px;
+                margin-left:0;
+                margin-right:auto;
+            }
+            .sec04 {
+                background-image: url(./images/main-sec04.jpg);
+            }
+            .sec05 {
+                background-image: url(./images/main-sec05.jpg);
+            }
+            .sec05 .container{
+                width:740px;
+                margin-left:auto;
+                margin-right:0;
+            }
+            .sec06 {
+                background-image: url(./images/main-sec06.jpg);
+            }
+            .sec06 .container{
+                width:460px;
+                margin-left:0;
+                margin-right:auto;
+            }
+            .sec07 {
+                background-image: url(./images/main-sec08.jpg);
+            }
+            .sec07 .container{
+                width:740px;
+                margin-left:0;
+                margin-right:auto;
+            }
+            .sec08 .container{
+                width:460px;
+                margin-left:auto;
+                margin-right:0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <section class="wrap">
+        <header class="header">
+            <div class="container">
+                <h1><a href="#"><span>빽다방</span><img src="./images/logo.png" alt="빽다방"></a></h1>
+                <div class="q-nav">
+                    <ul>
+                        <li><a href="#">더본코리아</a></li>
+                        <li>
+                            <a href="#"><img src="./images/ico-face.png" alt="페이스북 바로가기"></a>
+                            <a href="#"><img src="./images/ico-insta.png" alt="인스타그램 바로가기"></a>
+                        </li>
+                    </ul>
+                </div>
+                <div class="btn-nav">
+                    <span>네비게이션 버튼</span>
+                </div>
+                <nav>
+                    <ul class="main-nav">
+                        <li class="item01">
+                            <a href="#">빽다방</a>
+                            <ul class="sub-nav">
+                                <li><a href="#">CEO 인사말</a></li>
+                                <li><a href="#">빽다방 소개</a></li>
+                                <li><a href="#">멤버십 / 앱 소개</a></li>
+                                <li><a href="#">커피 이야기</a></li>
+                                <li><a href="#">교육 이야기</a></li>
+                            </ul>
+                        </li>
+                        <li class="item02">
+                            <a href="#">메뉴</a>
+                            <ul class="sub-nav">
+                                <li><a href="#">신메뉴</a></li>
+                                <li><a href="#">커피</a></li>
+                                <li><a href="#">음료</a></li>
+                                <li><a href="#">아이스크림/디저트</a></li>
+                                <li><a href="#">빽스치노</a></li>
+                            </ul>
+                        </li>
+                        <li class="item03">
+                            <a href="#">소식</a>
+                            <ul class="sub-nav">
+                                <li><a href="#">소식</a></li>
+                                <li><a href="#">이벤트</a></li>
+                                <li><a href="#">친절 우수매장</a></li>
+                            </ul>
+                        </li>
+                        <li class="item04">
+                            <a href="#">커뮤니티</a>
+                            <ul class="sub-nav">
+                                <li><a href="#">커피 클래스</a></li>
+                            </ul>
+                        </li>
+                        <li class="item05">
+                            <a href="#">매장안내</a>
+                            <ul class="sub-nav">
+                                <li><a href="#">매장찾기</a></li>
+                            </ul>
+                        </li>
+                        <li class="item06">
+                            <a href="#">창업안내</a>
+                            <ul class="sub-nav">
+                                <li><a href="#">왜 빽다방인가요?</a></li>
+                                <li><a href="#">창업상담 신청</a></li>
+                                <li><a href="#">창업절차 및 조건</a></li>
+                                <li><a href="#">인테리어</a></li>
+                            </ul>
+                        </li>
+                        <li class="item07">
+                            <a href="https://www.theborn.co.kr/custom-sound/" target="_blank">고객의 소리</a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        <aside class="aside">
+            <div class="container">
+                <ul>
+                    <li><a href="#"><img src="./images/btn-presentation.png" alt="창업설명회 신청"></a></li>
+                    <li><a href="#"><img src="./images/btn-counsel.png" alt="창업 상담 신청"></a></li>
+                </ul>
+            </div>
+        </aside>
+        <section class="sec sec01">
+            <div class="container">
+                <ul class="slider">
+                    <li>
+                        <picture>
+                            <source media="(min-width:1200px)" srcset="./images/main-slide01.jpg">
+                            <img src="./images/main-mo-slide01.jpg" alt="쿨라임에이드">
+                        </picture>                            
+                    </li>
+                    <li>
+                        <picture>
+                            <source media="(min-width:1200px)" srcset="./images/main-slide02.jpg">
+                            <img src="./images/main-mo-slide02.jpg" alt="깔라만시스무디">
+                        </picture>
+                    </li>                        
+                    <li>
+                        <picture>
+                            <source media="(min-width:1200px)" srcset="./images/main-slide03.jpg">
+                            <img src="./images/main-mo-slide03.jpg" alt="블루캔디">
+                        </picture>                        
+                    </li>
+                    <li>
+                        <picture>
+                            <source media="(min-width:1200px)" srcset="./images/main-slide04.jpg">
+                            <img src="./images/main-mo-slide04.jpg" alt="빽다방 맴버십">                        
+                        </picture>
+                    </li>
+                </ul>
+            </div>
+        </section>
+        <section class="sec sec02 sec-com">
+            <div class="container">
+                <h2>PAIK’S COFFEE<br>STORY</h2>
+                <p>균형잡힌 바디감으로 긴 여운을 남기는 빽다방 커피를 만나보세요.</p>
+                <div class="btn-view"><a href="#">더보기</a></div>
+            </div>
+        </section>
+        <section class="sec sec03 sec-com">
+            <div class="container">
+                <h2>PAIK’S COFFEE<br>BRAND</h2>
+                <p>합리적인 가격으로 만나는 맛있고 든든한 빽다방</p>
+                <div class="btn-view"><a href="#">더보기</a></div>
+            </div>
+        </section>
+        <section class="sec sec04 sec-com sec-com01">
+            <div class="container">
+                <h2>FRESH<br>COFFEE</h2>
+                <p>신선한 뉴크롭 원두를 사용하여<br>추출한 커피메뉴!</p>
+                <div class="btn-view"><a href="#">더보기</a></div>
+            </div>
+        </section>
+        <section class="sec sec05 sec-com sec-com01">
+            <div class="container">
+                <h2>VARIOUS<br>BEVERAGE</h2>
+                <p>에이드, 티, 주스 등 취향대로<br>골라 먹는 즐거움!</p>
+                <div class="btn-view"><a href="#">더보기</a></div>
+            </div>
+        </section>
+        <section class="sec sec06 sec-com sec-com01">
+            <div class="container">
+                <h2>SWEET<br>PAIK'S CCINO</h2>
+                <p>달콤 시원한 빽다방<br>시그니처 메뉴!</p>
+                <div class="btn-view"><a href="#">더보기</a></div>
+            </div>
+        </section>
+        <section class="sec sec07 sec-com sec-com01">
+            <div class="container">
+                <h2>TASTY<br>ICE CREAM /<br>DESSERT</h2>
+                <p>달콤한 아이스크림부터<br>든든한 브레드까지!</p>
+                <div class="btn-view"><a href="#">더보기</a></div>
+            </div>
+        </section>
+        <section class="sec sec08 sec-com">
+            <div class="container">
+                <h2>STORE And FRANCHISE</h2>
+                <article>
+                    <h3>STORE</h3>
+                    <p>원하시는 지역의 매장을 검색해보세요!</p>
+                    <form action="#">
+                        <input type="text" placeholder="검색지역을 입력하세요">
+                        <button>검색</button>
+                    </form>
+                </article>
+                <article>
+                    <h3>FRANCHISE</h3>
+                    <p>빽다방 창업안내를 도와드리겠습니다.</p>
+                    <div class="btn-view"><a href="#">더보기</a></div>
+                </article>
+            </div>
+        </section>        
+        <section class="sec sec09 sec-com">
+            <div class="container">
+                <h2>PAIK’S COFFEE SNS</h2>
+                <p>#빽다방 #빽다방신메뉴 #빽다방이벤트</p>
+                <div class="btn-view"><a href="#">더보기1</a></div>
+                <div class="btn-view"><a href="#">더보기2</a></div>
+            </div>
+        </section>
+        <footer class="footer">
+            <div class="container">
+                <div class="footer-logo"><a href="#"><img src="" alt=""></a></div>                
+                <address>
+
+                </address>
+                <select name="" id="">
+                    <option value=""></option>
+                    <option value=""></option>
+                    <option value=""></option>
+                    <option value=""></option>
+                    <option value=""></option>
+                </select>
+            </div>
+        </footer>
+    </section>
+    <script>
+        function fnSubCall(self){                        
+            $('.sub-nav').not($(self).next()).slideUp(300);
+            $(self).next().slideToggle(300);
+        }
+
+        // 헤더높이만큼 레퍼의 패딩 조정 함수
+        function fnHH(){
+            let elWrap = document.getElementsByClassName('wrap')[0];
+            let headerHeight = document.getElementsByClassName('header')[0].offsetHeight;
+            elWrap.style.paddingTop = `${headerHeight}px`;            
+        }
+
+        // 문서 로드시 조정
+        fnHH();
+        
+        // 리사이즈시 조정 이벤트
+        window.onresize = function(){
+            fnHH();
+        }
+        
+        // 네비게이션 호출 이벤트
+        let btnNav = document.querySelectorAll('.btn-nav')[0];
+        btnNav.onclick = function(){            
+            let elBack = document.querySelectorAll('.header')[0];
+            btnNav.classList.toggle('active');
+            elBack.classList.toggle('active');
+        }
+        
+        // 모바일 서브내비게이션 호출 이벤트
+        $('.main-nav>li>a').click(function(){
+            let ww = $(window).width();
+            console.log(ww);
+            if(ww<1200){
+                fnSubCall(this);           
+            }
+        }) 
+        
+        // 데스크탑 서브내비게이션 호출 이벤트
+        $('.main-nav>li>a').mouseenter(function(){
+            let ww = $(window).width();
+            if(ww>=1200){
+                fnSubCall(this);
+                $('.header').addClass('active');
+            }            
+        })
+
+        $('.header').mouseleave(function(){
+            let ww = $(window).width();
+            if(ww>=1200){
+                $('.header').removeClass('active');
+                $('.sub-nav').slideUp(200);
+            }
+        })
+
+        // 메인 슬라이더        
+        $(".slider").bxSlider();
+        
+    </script>
+</body>
+</html>
